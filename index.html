@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SecureW2 Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@300;400;700;900&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Chivo', sans-serif;
+    background: #f7f8fa;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+  :root { --red: #c33329; --navy: #1b2a3b; --border: #e2e5ea; }
+
+  header {
+    background: linear-gradient(135deg, var(--navy) 0%, #243447 100%);
+    padding: 48px 56px 40px;
+    border-bottom: 3px solid var(--red);
+  }
+  header .brand { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 16px; }
+  header .brand span { color: var(--red); }
+  header h1 { font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+  header p { font-size: 14.5px; color: rgba(255,255,255,.65); max-width: 560px; }
+
+  main { padding: 48px 56px; max-width: 900px; }
+  h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 20px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow .15s, border-color .15s;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); border-color: var(--red); }
+  .card-tag {
+    display: inline-block; padding: 2px 9px; border-radius: 10px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+    background: #fff2f2; color: var(--red); border: 1px solid rgba(195,51,41,.2);
+    align-self: flex-start;
+  }
+  .card-tag.blue { background: #eef6ff; color: #2563eb; border-color: rgba(37,99,235,.2); }
+  .card h3 { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .card p { font-size: 13px; color: #555; line-height: 1.6; }
+  .card .arrow { font-size: 13px; color: var(--red); font-weight: 700; margin-top: auto; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Secure<span>W2</span></div>
+  <h1>Documentation Hub</h1>
+  <p>Integration guides, migration references, and configuration walkthroughs for SecureW2 products.</p>
+</header>
+<main>
+  <h2>Guides</h2>
+  <div class="card-grid">
+    <a class="card" href="ca-migration-guide.html">
+      <span class="card-tag">Migration</span>
+      <h3>DigiCert G1 → G3 RADIUS CA Migration</h3>
+      <p>Step-by-step instructions for migrating trusted CA certificates across iOS, macOS, Windows, Android, Cisco Meraki, Workspace ONE, and Okta Device Trust.</p>
+      <span class="arrow">Read guide →</span>
+    </a>
+    <a class="card" href="workspace-one-event-hooks.html">
+      <span class="card-tag blue">Integration</span>
+      <h3>Workspace ONE Event Hooks</h3>
+      <p>Configure outbound event notifications from VMware Workspace ONE to SecureW2 for automatic certificate revocation on device deletion or wipe.</p>
+      <span class="arrow">Read guide →</span>
+    </a>
+    <a class="card" href="entra-id-adaptive-defense-guide.html">
+      <span class="card-tag blue">Integration</span>
+      <h3>Entra ID – Adaptive Defense External Automation</h3>
+      <p>Set up SecureW2 Autonomous Security Operations with Microsoft Entra ID for real-time, event-driven group management and certificate revocation.</p>
+      <span class="arrow">Read guide →</span>
+    </a>
+  </div>
+</main>
+</body>
+</html>
