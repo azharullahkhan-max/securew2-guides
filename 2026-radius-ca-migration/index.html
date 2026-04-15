@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DigiCert G1 → G3 RADIUS CA Migration Guide — SecureW2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@300;400;700;900&display=swap" rel="stylesheet" />
+<style>
+  /* ── Reset & base ─────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Chivo', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1a1a1a;
+    background: #f7f8fa;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Brand tokens ─────────────────────────────────────────────── */
+  :root {
+    --red:        #c33329;
+    --red-dark:   #a0271e;
+    --red-light:  #fdf2f2;
+    --navy:       #1b2a3b;
+    --sidebar-bg: #1b2a3b;
+    --sidebar-w:  270px;
+    --accent:     #e8f0fe;
+    --border:     #e2e5ea;
+    --warn-bg:    #fff8e1;
+    --warn-border:#f0a500;
+    --note-bg:    #eef6ff;
+    --note-border:#3b82f6;
+    --tip-bg:     #f0fdf4;
+    --tip-border: #22c55e;
+  }
+
+  /* ── Sidebar ──────────────────────────────────────────────────── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .sidebar-logo .brand {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -.3px;
+  }
+  .sidebar-logo .brand span { color: var(--red); }
+  .sidebar-logo .tagline {
+    font-size: 11px;
+    color: rgba(255,255,255,.45);
+    margin-top: 2px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+
+  #sidebar nav { padding: 12px 0 32px; flex: 1; }
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.3);
+    padding: 16px 20px 6px;
+  }
+  #sidebar nav a {
+    display: block;
+    padding: 8px 20px 8px 22px;
+    color: rgba(255,255,255,.72);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 400;
+    border-left: 3px solid transparent;
+    transition: all .15s;
+  }
+  #sidebar nav a:hover {
+    color: #fff;
+    background: rgba(255,255,255,.06);
+    border-left-color: rgba(195,51,41,.5);
+  }
+  #sidebar nav a.active {
+    color: #fff;
+    font-weight: 700;
+    border-left-color: var(--red);
+    background: rgba(195,51,41,.12);
+  }
+  #sidebar nav a .nav-sub {
+    display: block;
+    font-size: 12px;
+    color: rgba(255,255,255,.4);
+    font-weight: 300;
+    margin-top: 1px;
+  }
+
+  /* ── Main content ─────────────────────────────────────────────── */
+  #main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    padding: 0 0 80px;
+    max-width: 100%;
+  }
+
+  /* ── Hero / page header ───────────────────────────────────────── */
+  .page-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #243447 100%);
+    padding: 48px 56px 40px;
+    border-bottom: 3px solid var(--red);
+  }
+  .page-hero .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+  .page-hero h1 {
+    font-size: 30px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.25;
+    margin-bottom: 14px;
+  }
+  .page-hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,.65);
+    max-width: 640px;
+    line-height: 1.65;
+  }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: rgba(255,255,255,.1);
+    color: rgba(255,255,255,.8);
+    border: 1px solid rgba(255,255,255,.15);
+  }
+
+  /* ── Section layout ───────────────────────────────────────────── */
+  .content-section {
+    padding: 48px 56px 0;
+    max-width: 900px;
+  }
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 56px 0;
+    max-width: 844px;
+  }
+
+  h2.section-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--navy);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2.section-title .platform-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: var(--red);
+    color: #fff;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .section-subtitle {
+    font-size: 13.5px;
+    color: #666;
+    margin-bottom: 28px;
+  }
+
+  h3.method-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 32px 0 14px;
+    padding-bottom: 7px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .method-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--red-light);
+    color: var(--red);
+    border: 1px solid rgba(195,51,41,.2);
+  }
+  .method-badge.mdm { background: #eef6ff; color: #2563eb; border-color: rgba(37,99,235,.2); }
+
+  /* ── Callout boxes ────────────────────────────────────────────── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body strong { display: block; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .callout.warn  { background: var(--warn-bg);  border-left: 4px solid var(--warn-border); }
+  .callout.note  { background: var(--note-bg);  border-left: 4px solid var(--note-border); }
+  .callout.tip   { background: var(--tip-bg);   border-left: 4px solid var(--tip-border);  }
+  .callout.danger{ background: #fff2f2; border-left: 4px solid var(--red); }
+
+  /* ── Prerequisites ────────────────────────────────────────────── */
+  .prereq-block {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+  }
+  .prereq-block h4 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+  .prereq-block ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .prereq-block ul li {
+    font-size: 13.5px;
+    color: #333;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .prereq-block ul li::before {
+    content: "✓";
+    color: var(--tip-border);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── Steps ────────────────────────────────────────────────────── */
+  .steps { display: flex; flex-direction: column; gap: 0; margin: 18px 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    position: relative;
+  }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 15px; top: 36px; bottom: -4px;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--red);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-body {
+    flex: 1;
+    padding-bottom: 20px;
+  }
+  .step-body strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .step-body p, .step-body li { font-size: 13.5px; color: #444; }
+  .step-body ul { margin: 6px 0 0 16px; }
+  .step-body ul li { margin-bottom: 3px; }
+
+  /* ── Confirmation box ─────────────────────────────────────────── */
+  .confirmation {
+    background: var(--tip-bg);
+    border: 1px solid var(--tip-border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 22px;
+    font-size: 13.5px;
+    color: #166534;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .confirmation strong { font-weight: 700; }
+
+  /* ── Code / path ──────────────────────────────────────────────── */
+  code {
+    font-family: 'Chivo Mono', 'Courier New', monospace;
+    font-size: 12.5px;
+    background: #f0f2f5;
+    border: 1px solid #d8dce3;
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: #c33329;
+  }
+
+  /* ── Overview table ───────────────────────────────────────────── */
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin-top: 16px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .overview-table th {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+  }
+  .overview-table td {
+    padding: 11px 16px;
+    border-top: 1px solid var(--border);
+    color: #333;
+    vertical-align: middle;
+  }
+  .overview-table tr:hover td { background: #fafafa; }
+  .status-pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .status-pill.required { background: #fff2f2; color: var(--red); border: 1px solid rgba(195,51,41,.2); }
+  .status-pill.mdm      { background: #eef6ff; color: #2563eb;   border: 1px solid rgba(37,99,235,.2); }
+  .status-pill.auto     { background: #f0fdf4; color: #16a34a;   border: 1px solid rgba(22,163,74,.2); }
+
+  /* ── Scrollspy active highlight ───────────────────────────────── */
+  @media (max-width: 760px) {
+    #sidebar { transform: translateX(-100%); }
+    #main    { margin-left: 0; }
+    .page-hero, .content-section { padding-left: 20px; padding-right: 20px; }
+    .section-divider { margin-left: 20px; margin-right: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════════════════════════ -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">Secure<span>W2</span></div>
+    <div class="tagline">CA Migration Guide</div>
+  </div>
+
+  <nav id="nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="#overview" class="active">Introduction
+      <span class="nav-sub">What's changing &amp; why</span>
+    </a>
+    <a href="#scope">Migration Scope</a>
+
+    <div class="nav-section-label">Platform Guides</div>
+    <a href="#ios">iOS
+      <span class="nav-sub">Manual · Jamf Pro</span>
+    </a>
+    <a href="#macos">macOS
+      <span class="nav-sub">Manual · Jamf Pro</span>
+    </a>
+    <a href="#windows">Windows
+      <span class="nav-sub">Manual · Intune</span>
+    </a>
+    <a href="#android">Android
+      <span class="nav-sub">Intune · Manual</span>
+    </a>
+
+    <div class="nav-section-label">Infrastructure</div>
+    <a href="#meraki">Cisco Meraki</a>
+    <a href="#workspace-one">VMware Workspace ONE</a>
+    <a href="#okta">Okta Device Trust</a>
+  </nav>
+</aside>
+
+<!-- ════════════════════════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════════════════════════ -->
+<main id="main">
+
+  <!-- Hero -->
+  <header class="page-hero">
+    <div class="eyebrow">SecureW2 · RADIUS Infrastructure</div>
+    <h1>DigiCert G1 → G3 Trust Migration<br>for RADIUS Authentication</h1>
+    <p>DigiCert is deprecating its G1 root CA hierarchy. This guide walks your team through updating trusted CA certificates across every managed platform to maintain uninterrupted RADIUS-based Wi-Fi and VPN authentication.</p>
+    <div class="badge-row">
+      <span class="badge">iOS</span>
+      <span class="badge">macOS</span>
+      <span class="badge">Windows</span>
+      <span class="badge">Android</span>
+      <span class="badge">Cisco Meraki</span>
+      <span class="badge">VMware Workspace ONE</span>
+      <span class="badge">Okta Device Trust</span>
+    </div>
+  </header>
+
+  <!-- ── OVERVIEW ─────────────────────────────────────────────── -->
+  <section id="overview" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon">!</span>
+      What's Changing
+    </h2>
+    <p class="section-subtitle">Understanding the DigiCert root CA transition</p>
+
+    <p>DigiCert is retiring its <strong>G1 (SHA-1 / legacy RSA)</strong> root certificate hierarchy in favour of the modern <strong>G3 (SHA-256 / RSA 4096)</strong> hierarchy. Any RADIUS server certificate currently chaining to a DigiCert G1 root will be re-issued under G3.</p>
+
+    <div class="callout danger">
+      <span class="callout-icon">🔴</span>
+      <div class="callout-body">
+        <strong>Authentication will break if you don't act</strong>
+        Devices that only trust the G1 root will reject the new G3-signed server certificate and fail 802.1X authentication after the cutover date.
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>No user credentials change</strong>
+        This migration only updates which CA certificates devices trust. Usernames, passwords, and certificates issued to devices or users are not affected.
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ── SCOPE TABLE ───────────────────────────────────────────── -->
+  <section id="scope" class="content-section">
+    <h2 class="section-title">Migration Scope</h2>
+    <p class="section-subtitle">What needs to change on each platform</p>
+
+    <table class="overview-table">
+      <thead>
+        <tr>
+          <th>Platform</th>
+          <th>Delivery Method</th>
+          <th>Action Required</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>iOS (manual)</td><td>Configuration Profile (.mobileconfig)</td><td>Install G3 trust profile, remove G1</td><td><span class="status-pill required">Manual</span></td></tr>
+        <tr><td>iOS (Jamf)</td><td>Jamf Pro Configuration Profile</td><td>Push new CA payload</td><td><span class="status-pill mdm">MDM</span></td></tr>
+        <tr><td>macOS (manual)</td><td>Keychain Access / Terminal</td><td>Add G3 to System keychain, remove G1</td><td><span class="status-pill required">Manual</span></td></tr>
+        <tr><td>macOS (Jamf)</td><td>Jamf Pro Configuration Profile</td><td>Push new CA payload</td><td><span class="status-pill mdm">MDM</span></td></tr>
+        <tr><td>Windows (manual)</td><td>certlm.msc / GPO</td><td>Import G3, remove G1 after rollout</td><td><span class="status-pill required">Manual</span></td></tr>
+        <tr><td>Windows (Intune)</td><td>Trusted Certificate Profile</td><td>Deploy G3 profile; retire G1 profile</td><td><span class="status-pill mdm">MDM</span></td></tr>
+        <tr><td>Android (Intune)</td><td>Trusted Certificate Profile</td><td>Deploy G3 profile</td><td><span class="status-pill mdm">MDM</span></td></tr>
+        <tr><td>Android (manual)</td><td>Device Settings</td><td>Install G3 CA cert manually</td><td><span class="status-pill required">Manual</span></td></tr>
+        <tr><td>Cisco Meraki</td><td>Meraki Dashboard</td><td>Upload G3 cert to RADIUS trust store</td><td><span class="status-pill required">Manual</span></td></tr>
+        <tr><td>VMware Workspace ONE</td><td>WS1 UEM Console</td><td>Add G3 to CA store, push profile</td><td><span class="status-pill mdm">MDM</span></td></tr>
+        <tr><td>Okta Device Trust</td><td>Okta Admin Console</td><td>Update Device Trust CA to G3</td><td><span class="status-pill mdm">MDM</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ════════════════════ iOS ════════════════════════════════════ -->
+  <section id="ios" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon" style="font-size:18px;">📱</span>
+      iOS
+    </h2>
+    <p class="section-subtitle">iPhone &amp; iPad — manual profile install and Jamf Pro deployment</p>
+
+    <!-- iOS Manual -->
+    <h3 class="method-title">Manual Installation <span class="method-badge">Manual</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>iOS 14 or later</li>
+        <li>G3 root CA certificate file (.cer or .mobileconfig) from SecureW2 portal</li>
+        <li>Unsupervised devices: access to <em>Settings → General → VPN &amp; Device Management</em></li>
+        <li>Supervised devices: the MDM-pushed profile covers trust automatically — no manual profile install required</li>
+      </ul>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <strong>Supervised devices can skip steps 1–4</strong>
+        If your devices are Apple-supervised and managed by an MDM, the trust profile will be installed silently via MDM push. Confirm by checking <em>Settings → General → VPN &amp; Device Management</em> for an existing SecureW2 profile before proceeding.
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Download the G3 trust profile</strong>
+          <p>Log in to the SecureW2 JoinNow portal and navigate to <strong>Resources → CA Certificates → DigiCert G3 Root</strong>. Download the <code>.mobileconfig</code> file to the device.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Open the profile</strong>
+          <p>Tap the downloaded file. iOS will show a "Profile Downloaded" banner. Go to <em>Settings → General → VPN &amp; Device Management</em> and tap the profile under <strong>Downloaded Profile</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Install and trust the certificate</strong>
+          <p>Tap <strong>Install</strong>, enter your device passcode, then tap <strong>Install</strong> again on the warning screen. Tap <strong>Done</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Enable full trust (if prompted)</strong>
+          <p>Go to <em>Settings → General → About → Certificate Trust Settings</em>. Toggle on the DigiCert G3 root under <strong>Enable Full Trust For Root Certificates</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Remove the G1 profile</strong>
+          <p>In <em>Settings → General → VPN &amp; Device Management</em>, find the old DigiCert G1 profile and tap <strong>Remove Profile</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <strong>Reconnect to Wi-Fi</strong>
+          <p>Toggle Wi-Fi off and on. The device should authenticate successfully using the new G3-signed RADIUS certificate.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> The device joins the 802.1X network without a certificate trust prompt and maintains a stable connection.</div>
+    </div>
+
+    <!-- iOS Jamf -->
+    <h3 class="method-title">Jamf Pro Deployment <span class="method-badge mdm">MDM</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Jamf Pro 10.40 or later</li>
+        <li>Devices enrolled via Automated Device Enrollment (ADE) or User-initiated Enrollment</li>
+        <li>DigiCert G3 root CA .cer file uploaded to Jamf Pro</li>
+        <li>Admin access to Jamf Pro console</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Upload the G3 certificate</strong>
+          <p>In Jamf Pro go to <em>Settings → Global Management → PKI Certificates</em>. Click <strong>Upload</strong> and select the DigiCert G3 root .cer file. Name it clearly, e.g. <code>DigiCert-G3-Root</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Create a Configuration Profile</strong>
+          <p>Navigate to <em>Devices → Configuration Profiles → New</em>. Add a <strong>Certificate</strong> payload. Select the uploaded G3 cert and set <em>Allow apps access</em> to <strong>Yes</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Set scope</strong>
+          <p>Under the <strong>Scope</strong> tab add the target device groups or all managed iOS devices. Exclude any test group you use for staged rollouts.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Deploy and verify</strong>
+          <p>Click <strong>Save</strong>. Jamf will push the profile at the next check-in (or force a check-in via <em>Devices → Management Commands → Send Blank Push</em>).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Remove the G1 profile</strong>
+          <p>Once all devices show the G3 profile as installed in Jamf inventory, edit the old G1 configuration profile and click <strong>Delete</strong>. Jamf will remove it from devices on next check-in.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Jamf Pro inventory shows profile status as <em>Installed</em> for all in-scope devices. RADIUS logs show successful EAP-TLS handshakes.</div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ═══════════════════ macOS ═══════════════════════════════════ -->
+  <section id="macos" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon" style="font-size:18px;">💻</span>
+      macOS
+    </h2>
+    <p class="section-subtitle">Mac computers — Keychain manual install and Jamf Pro deployment</p>
+
+    <!-- macOS Manual -->
+    <h3 class="method-title">Manual Installation <span class="method-badge">Manual</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>macOS 12 Monterey or later</li>
+        <li>Local administrator account</li>
+        <li>DigiCert G3 root CA .cer file downloaded from SecureW2 portal</li>
+        <li>Access to Keychain Access app or Terminal</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Download the G3 root certificate</strong>
+          <p>Log in to the SecureW2 JoinNow portal. Download the DigiCert G3 Root CA .cer file to your <code>~/Downloads</code> folder.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Add to System keychain</strong>
+          <p>Open <strong>Keychain Access</strong> (<em>Applications → Utilities</em>). Select <strong>System</strong> keychain in the left panel. Drag the .cer file into the certificate list, or use <em>File → Import Items</em>. Enter your admin password when prompted.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Set trust to Always Trust</strong>
+          <p>Double-click the imported DigiCert G3 certificate. Expand the <strong>Trust</strong> section. Set <em>When using this certificate</em> to <strong>Always Trust</strong>. Close the window and enter your admin password.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Remove the G1 certificate</strong>
+          <p>Search for "DigiCert G1" in Keychain Access. Select the certificate in the <strong>System</strong> keychain, right-click, and choose <strong>Delete</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Reconnect to the network</strong>
+          <p>Turn Wi-Fi off and back on via the menu bar. macOS will re-authenticate via 802.1X against the new G3-signed RADIUS certificate.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Terminal alternative</strong>
+        You can also run: <code>sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ~/Downloads/DigiCertG3Root.cer</code>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Wi-Fi connects automatically without a certificate trust dialog. Keychain Access shows the G3 cert as <em>This certificate is marked as trusted for all users</em>.</div>
+    </div>
+
+    <!-- macOS Jamf -->
+    <h3 class="method-title">Jamf Pro Deployment <span class="method-badge mdm">MDM</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Jamf Pro 10.40 or later</li>
+        <li>macOS devices enrolled and MDM-managed</li>
+        <li>DigiCert G3 root CA .cer file uploaded to Jamf</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Upload the G3 certificate</strong>
+          <p>In Jamf Pro, go to <em>Settings → Global Management → PKI Certificates</em> and upload the G3 root .cer.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Create a macOS Configuration Profile</strong>
+          <p>Go to <em>Computers → Configuration Profiles → New</em>. Add a <strong>Certificate</strong> payload. Select the G3 cert. Set <em>System keychain</em> as the target.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Add a Wi-Fi payload (if needed)</strong>
+          <p>If your existing Wi-Fi profile references the G1 CA, update the <strong>Wi-Fi</strong> payload within the same profile to point to the G3 cert for server certificate verification.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Scope and deploy</strong>
+          <p>Assign the profile to the appropriate computer groups. Save and push via blank MDM command.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Retire the G1 profile</strong>
+          <p>After confirming successful deployment, delete the G1 configuration profile from Jamf Pro. It will be removed from devices on next check-in.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Jamf inventory shows the G3 profile installed on all targets. RADIUS authentication logs show no G1-related errors.</div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ═══════════════════ WINDOWS ═════════════════════════════════ -->
+  <section id="windows" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon" style="font-size:18px;">🖥️</span>
+      Windows
+    </h2>
+    <p class="section-subtitle">Windows 10 / 11 — manual certificate store and Intune deployment</p>
+
+    <!-- Windows Manual -->
+    <h3 class="method-title">Manual Installation <span class="method-badge">Manual</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Windows 10 21H2 or later / Windows 11</li>
+        <li>Local administrator or domain admin rights</li>
+        <li>DigiCert G3 root CA .cer file from SecureW2 portal</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Open the certificate store</strong>
+          <p>Press <kbd>Win + R</kbd>, type <code>certlm.msc</code>, and press Enter. This opens the <strong>Local Machine</strong> certificate store.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Import the G3 root certificate</strong>
+          <p>Expand <em>Trusted Root Certification Authorities → Certificates</em>. Right-click → <strong>All Tasks → Import</strong>. Follow the wizard, selecting the G3 .cer file. Place it in the <em>Trusted Root Certification Authorities</em> store.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Verify the import</strong>
+          <p>Refresh the list. Confirm the DigiCert G3 root appears with a valid thumbprint matching the one published in the SecureW2 portal.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Remove the G1 certificate</strong>
+          <p>Locate the DigiCert G1 root in the same store. Right-click → <strong>Delete</strong>. Confirm deletion.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Reconnect to the network</strong>
+          <p>Disconnect and reconnect to the 802.1X Wi-Fi or VPN. Windows should authenticate without a certificate warning.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Network adapter status shows <em>Connected</em> with no authentication errors in Event Viewer under <em>Applications and Services Logs → Microsoft → Windows → WLAN-AutoConfig</em>.</div>
+    </div>
+
+    <!-- Windows Intune -->
+    <h3 class="method-title">Microsoft Intune Deployment <span class="method-badge mdm">MDM</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Microsoft Intune tenant with Windows device management enabled</li>
+        <li>Devices enrolled in Intune (Hybrid AAD or AAD joined)</li>
+        <li>DigiCert G3 root CA .cer file</li>
+        <li>Intune admin role: Device Configuration Manager or higher</li>
+      </ul>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Do not remove the G1 profile until all devices have the G3 profile installed</strong>
+        Removing the G1 trusted certificate profile before a device receives the G3 profile will leave that device with no trusted CA for your RADIUS server — breaking 802.1X authentication immediately. Stage the G1 removal only after Intune reports 100% G3 profile success across all targeted devices.
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Create a Trusted Certificate profile for G3</strong>
+          <p>In Microsoft Intune admin center, go to <em>Devices → Configuration → Create → New Policy</em>. Select <strong>Windows 10 and later</strong> as platform and <strong>Trusted certificate</strong> as profile type.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Upload the G3 root certificate</strong>
+          <p>On the Configuration settings page, click <strong>Upload a certificate</strong> and select the DigiCert G3 .cer file. Set <em>Destination store</em> to <strong>Computer certificate store – Root</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Assign to device groups</strong>
+          <p>On the Assignments page, add the target Entra ID device groups. Use a pilot group first. Click <strong>Next</strong> and <strong>Create</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Monitor rollout</strong>
+          <p>Go to <em>Devices → Monitor → Assignment status</em> for the profile. Wait until <strong>Succeeded</strong> count matches total enrolled devices in scope before proceeding.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Remove the G1 Trusted Certificate profile</strong>
+          <p>Only after full G3 rollout: navigate to the G1 Trusted Certificate profile in Intune. Remove all assignments, then delete the profile. Intune will remove the G1 cert from devices at next sync.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Intune shows G3 profile as <em>Succeeded</em> for all devices. G1 profile shows 0 assignments. No RADIUS authentication failures in your NPS or SecureW2 logs.</div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ═══════════════════ ANDROID ═════════════════════════════════ -->
+  <section id="android" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon" style="font-size:18px;">📲</span>
+      Android
+    </h2>
+    <p class="section-subtitle">Android 10+ — Intune deployment and manual install</p>
+
+    <!-- Android Intune -->
+    <h3 class="method-title">Microsoft Intune Deployment <span class="method-badge mdm">MDM</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Android 10 or later (Enterprise, Work Profile, or COPE enrollment)</li>
+        <li>Devices enrolled in Intune with Android device administrator or Android Enterprise profile</li>
+        <li>DigiCert G3 root CA .cer file</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Create a Trusted Certificate profile</strong>
+          <p>In Intune admin center, go to <em>Devices → Configuration → Create → New Policy</em>. Select <strong>Android Enterprise</strong> as platform. Choose the appropriate profile type for your enrollment (<em>Fully Managed</em>, <em>Dedicated</em>, or <em>Corporate-Owned Work Profile</em>) and <strong>Trusted certificate</strong> as profile type.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Upload the G3 certificate</strong>
+          <p>Upload the DigiCert G3 root .cer file. Set destination to <strong>CA certificate</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Assign and deploy</strong>
+          <p>Assign to your Android device groups. Save and create. Devices will receive the cert at next Intune sync.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Update Wi-Fi profile</strong>
+          <p>If your Android Wi-Fi configuration profile specifies the CA certificate for EAP validation, edit it to reference the G3 cert instead of G1.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Intune shows Trusted Certificate profile as <em>Succeeded</em>. Android devices authenticate to 802.1X Wi-Fi without manual trust prompts.</div>
+    </div>
+
+    <!-- Android Manual -->
+    <h3 class="method-title">Manual Installation <span class="method-badge">Manual</span></h3>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Android 10 or later (unmanaged or personally-owned devices)</li>
+        <li>G3 root CA .cer or .crt file accessible on device (email attachment, browser download, or USB)</li>
+        <li>Device screen lock set (required to install CA certificates)</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Transfer the G3 certificate to the device</strong>
+          <p>Download the DigiCert G3 root .cer file from the SecureW2 portal directly on the Android device, or email it and open from your mail app.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Install the certificate</strong>
+          <p>Go to <em>Settings → Security → Encryption &amp; Credentials → Install a certificate → CA Certificate</em>. Tap the downloaded file and confirm installation. (Path may vary by manufacturer.)</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Update the Wi-Fi network settings</strong>
+          <p>Forget and rejoin the 802.1X Wi-Fi network. Under <em>CA Certificate</em> in the Wi-Fi advanced settings, select the newly installed DigiCert G3 root.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Remove the G1 certificate (optional)</strong>
+          <p>Go to <em>Settings → Security → Trusted Credentials → User</em> and remove the DigiCert G1 root if present.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Device connects to 802.1X Wi-Fi without a certificate warning. Under Trusted Credentials the G3 root appears in the User store.</div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ═══════════════════ MERAKI ═══════════════════════════════════ -->
+  <section id="meraki" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon" style="font-size:18px;">🔗</span>
+      Cisco Meraki
+    </h2>
+    <p class="section-subtitle">Updating the RADIUS server CA trust in Meraki Dashboard</p>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Meraki Dashboard admin access (Network Admin or higher)</li>
+        <li>DigiCert G3 root CA .pem or .cer file</li>
+        <li>Existing RADIUS server configuration in Meraki (for WPA2-Enterprise SSIDs)</li>
+      </ul>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Perform during a maintenance window</strong>
+        Updating the RADIUS CA in Meraki requires saving the SSID configuration. This may briefly disrupt active 802.1X sessions on that SSID.
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Navigate to the SSID configuration</strong>
+          <p>In Meraki Dashboard, go to <em>Wireless → Configure → SSIDs</em>. Click <strong>Edit settings</strong> for the WPA2-Enterprise SSID used for RADIUS authentication.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Open RADIUS settings</strong>
+          <p>Scroll to the <strong>RADIUS</strong> section. Click <strong>Edit RADIUS servers</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Upload the G3 CA certificate</strong>
+          <p>Under <em>RADIUS CA Certificate</em>, click <strong>Upload certificate</strong>. Paste the PEM-encoded G3 root CA contents or upload the .cer file. Save the RADIUS server entry.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Save SSID configuration</strong>
+          <p>Click <strong>Save changes</strong> at the bottom of the SSID settings page. The new CA will take effect immediately.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Remove the G1 CA (after verification)</strong>
+          <p>Once you have confirmed successful authentication with the G3-signed RADIUS cert, return to the RADIUS CA Certificate field and remove the G1 certificate entry.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Meraki event log shows successful RADIUS authentication events. No <em>EAP failure</em> or <em>RADIUS timeout</em> errors in <em>Network-wide → Event log</em>.</div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ═══════════════════ WORKSPACE ONE ═══════════════════════════ -->
+  <section id="workspace-one" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon" style="font-size:18px;">☁️</span>
+      VMware Workspace ONE
+    </h2>
+    <p class="section-subtitle">UEM console — CA upload and profile push</p>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Workspace ONE UEM 22.x or later</li>
+        <li>Organization Group admin access</li>
+        <li>DigiCert G3 root CA .cer / .pem file</li>
+        <li>Devices enrolled in UEM with applicable OS profiles</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Upload G3 CA to UEM</strong>
+          <p>In the Workspace ONE UEM console navigate to <em>Resources → Profiles &amp; Baselines → Certificates → Certificate Authorities → Add → Upload</em>. Upload the G3 root .cer and name it <code>DigiCert-G3-Root</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Create or update a Device Profile</strong>
+          <p>Go to <em>Resources → Profiles &amp; Baselines → Profiles → Add → Add Profile</em>. Select the target platform (iOS, Android, macOS, or Windows). Add a <strong>Credentials</strong> payload, select <em>Upload</em> as the credential source, and choose the G3 CA uploaded in step 1.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Update the Wi-Fi payload</strong>
+          <p>If the profile includes a <strong>Wi-Fi</strong> payload for EAP settings, update the <em>Trusted Certificates</em> or <em>CA Certificate</em> reference to point to the G3 CA.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Assign and publish</strong>
+          <p>Assign the profile to the appropriate Smart Group. Click <strong>Save &amp; Publish</strong>. UEM will push the profile to enrolled devices.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Remove the G1 profile</strong>
+          <p>After confirming the G3 profile is installed across all devices in the Devices view, navigate to the G1 profile and click <strong>Delete</strong>. Workspace ONE will remove it from devices.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Workspace ONE dashboard shows the G3 profile as <em>Installed</em> for all targeted devices. RADIUS authentication succeeds post-migration.</div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ═══════════════════ OKTA DEVICE TRUST ══════════════════════ -->
+  <section id="okta" class="content-section">
+    <h2 class="section-title">
+      <span class="platform-icon" style="font-size:18px;">🔐</span>
+      Okta Device Trust
+    </h2>
+    <p class="section-subtitle">Updating the Device Trust CA in Okta Admin Console</p>
+
+    <div class="prereq-block">
+      <h4>Prerequisites</h4>
+      <ul>
+        <li>Okta tenant with Device Trust enabled (Okta Identity Engine or Classic with Device Trust add-on)</li>
+        <li>Super Admin or Org Admin role in Okta</li>
+        <li>DigiCert G3 root CA .pem file</li>
+        <li>MDM integration already configured in Okta (Jamf, Intune, Workspace ONE, or similar)</li>
+      </ul>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>Device Trust and RADIUS CA are separate trust stores</strong>
+        Okta Device Trust uses certificates to verify that a device is managed. If your RADIUS server certificate chains to DigiCert G3 and is presented during an Okta-enforced network policy, the Device Trust CA configuration must also reference G3 to complete the chain of trust.
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Navigate to Device Trust settings</strong>
+          <p>In the Okta Admin Console go to <em>Security → Device Trust</em>. Locate the configuration for your MDM platform integration.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Upload the G3 CA certificate</strong>
+          <p>Under <em>CA Certificates</em> (or <em>MDM CA Certificate</em> depending on your Okta version), click <strong>Add Certificate</strong>. Paste the PEM contents of the DigiCert G3 root CA or upload the .pem file.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Verify the certificate chain</strong>
+          <p>Click <strong>Test configuration</strong> if available, or authenticate a test device through your Okta-protected app to confirm the G3-chained certificate is accepted.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Update Sign-On Policies (if applicable)</strong>
+          <p>If you have Okta sign-on policies or app-level policies that reference a specific CA thumbprint or certificate constraint, update them to reference the G3 certificate instead of G1.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Remove the G1 CA entry</strong>
+          <p>Once G3 trust is confirmed and all devices are passing Device Trust evaluation, delete the G1 CA certificate entry from Okta Device Trust settings.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Removing G1 too early will fail Device Trust evaluations</strong>
+        Devices that have not yet received the G3 certificate via MDM will fail Okta Device Trust checks if G1 is removed from Okta before their MDM profile updates. Coordinate with your MDM rollout timeline.
+      </div>
+    </div>
+
+    <div class="confirmation">
+      <span style="font-size:18px;">✅</span>
+      <div><strong>Confirmation:</strong> Okta System Log shows successful Device Trust evaluations with no <em>Certificate chain validation failed</em> errors. Users on managed devices access Okta-protected resources without interruption.</div>
+    </div>
+  </section>
+
+  <div style="height:64px;"></div>
+
+</main>
+
+<!-- ════════════════════════════════════════════════════════════════
+     Scrollspy
+═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  const navLinks = document.querySelectorAll('#nav a');
+  const sections = Array.from(navLinks)
+    .map(a => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+
+  function onScroll() {
+    const scrollY = window.scrollY + 120;
+    let current = sections[0];
+    for (const s of sections) {
+      if (s.offsetTop <= scrollY) current = s;
+    }
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current.id);
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+</body>
+</html>
