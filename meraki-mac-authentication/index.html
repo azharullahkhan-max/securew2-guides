@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Chivo:wght@300;400;700;900&display=swap" rel="stylesheet" />
 <style>
-  /* ── Reset & base ─────────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
@@ -21,8 +20,6 @@
     display: flex;
     min-height: 100vh;
   }
-
-  /* ── Brand tokens ─────────────────────────────────────────────── */
   :root {
     --red:        #c33329;
     --red-dark:   #a0271e;
@@ -30,7 +27,6 @@
     --navy:       #1b2a3b;
     --sidebar-bg: #1b2a3b;
     --sidebar-w:  270px;
-    --accent:     #e8f0fe;
     --border:     #e2e5ea;
     --warn-bg:    #fff8e1;
     --warn-border:#f0a500;
@@ -40,308 +36,67 @@
     --tip-border: #22c55e;
   }
 
-  /* ── Sidebar ──────────────────────────────────────────────────── */
+  /* ── Sidebar ── */
   #sidebar {
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
+    position: fixed; top: 0; left: 0; bottom: 0;
     width: var(--sidebar-w);
     background: var(--sidebar-bg);
-    overflow-y: auto;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto; z-index: 100;
+    display: flex; flex-direction: column;
   }
-  .sidebar-logo {
-    padding: 24px 20px 18px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-  }
-  .sidebar-logo .brand {
-    font-size: 18px;
-    font-weight: 900;
-    color: #fff;
-    letter-spacing: -.3px;
-  }
+  .sidebar-logo { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar-logo .brand { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -.3px; }
   .sidebar-logo .brand span { color: var(--red); }
-  .sidebar-logo .tagline {
-    font-size: 11px;
-    color: rgba(255,255,255,.45);
-    margin-top: 2px;
-    letter-spacing: .4px;
-    text-transform: uppercase;
-  }
-
+  .sidebar-logo .tagline { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 2px; letter-spacing: .4px; text-transform: uppercase; }
   #sidebar nav { padding: 12px 0 32px; flex: 1; }
-  .nav-section-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,.3);
-    padding: 16px 20px 6px;
-  }
-  #sidebar nav a {
-    display: block;
-    padding: 8px 20px 8px 22px;
-    color: rgba(255,255,255,.72);
-    text-decoration: none;
-    font-size: 13.5px;
-    font-weight: 400;
-    border-left: 3px solid transparent;
-    transition: all .15s;
-  }
-  #sidebar nav a:hover {
-    color: #fff;
-    background: rgba(255,255,255,.06);
-    border-left-color: rgba(195,51,41,.5);
-  }
-  #sidebar nav a.active {
-    color: #fff;
-    font-weight: 700;
-    border-left-color: var(--red);
-    background: rgba(195,51,41,.12);
-  }
-  #sidebar nav a .nav-sub {
-    display: block;
-    font-size: 12px;
-    color: rgba(255,255,255,.4);
-    font-weight: 300;
-    margin-top: 1px;
-  }
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,.3); padding: 16px 20px 6px; }
+  #sidebar nav a { display: block; padding: 8px 20px 8px 22px; color: rgba(255,255,255,.72); text-decoration: none; font-size: 13.5px; font-weight: 400; border-left: 3px solid transparent; transition: all .15s; }
+  #sidebar nav a:hover { color: #fff; background: rgba(255,255,255,.06); border-left-color: rgba(195,51,41,.5); }
+  #sidebar nav a.active { color: #fff; font-weight: 700; border-left-color: var(--red); background: rgba(195,51,41,.12); }
+  #sidebar nav a .nav-sub { display: block; font-size: 12px; color: rgba(255,255,255,.4); font-weight: 300; margin-top: 1px; }
 
-  /* ── Main content ─────────────────────────────────────────────── */
-  #main {
-    margin-left: var(--sidebar-w);
-    flex: 1;
-    padding: 0 0 80px;
-    max-width: 100%;
-  }
+  /* ── Main ── */
+  #main { margin-left: var(--sidebar-w); flex: 1; padding: 0 0 80px; max-width: 100%; }
 
-  /* ── Hero / page header ───────────────────────────────────────── */
-  .page-hero {
-    background: linear-gradient(135deg, var(--navy) 0%, #243447 100%);
-    padding: 48px 56px 40px;
-    border-bottom: 3px solid var(--red);
-  }
-  .page-hero .eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
-    color: var(--red);
-    margin-bottom: 10px;
-  }
-  .page-hero h1 {
-    font-size: 30px;
-    font-weight: 900;
-    color: #fff;
-    line-height: 1.25;
-    margin-bottom: 14px;
-  }
-  .page-hero p {
-    font-size: 15px;
-    color: rgba(255,255,255,.65);
-    max-width: 640px;
-    line-height: 1.65;
-  }
+  /* ── Hero ── */
+  .page-hero { background: linear-gradient(135deg, var(--navy) 0%, #243447 100%); padding: 48px 56px 40px; border-bottom: 3px solid var(--red); }
+  .page-hero .eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: var(--red); margin-bottom: 10px; }
+  .page-hero h1 { font-size: 30px; font-weight: 900; color: #fff; line-height: 1.25; margin-bottom: 14px; }
+  .page-hero p { font-size: 15px; color: rgba(255,255,255,.65); max-width: 640px; line-height: 1.65; }
   .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
-  .badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11.5px;
-    font-weight: 700;
-    background: rgba(255,255,255,.1);
-    color: rgba(255,255,255,.8);
-    border: 1px solid rgba(255,255,255,.15);
-  }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 700; background: rgba(255,255,255,.1); color: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.15); }
 
-  /* ── Section layout ───────────────────────────────────────────── */
-  .content-section {
-    padding: 48px 56px 0;
-    max-width: 900px;
-  }
-  .section-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 48px 56px 0;
-    max-width: 844px;
-  }
+  /* ── Sections ── */
+  .content-section { padding: 48px 56px 0; max-width: 900px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 48px 56px 0; max-width: 844px; }
+  h2.section-title { font-size: 22px; font-weight: 900; color: var(--navy); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  h2.section-title .icon { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: var(--red); color: #fff; font-size: 16px; flex-shrink: 0; }
+  .section-subtitle { font-size: 13.5px; color: #666; margin-bottom: 28px; }
+  .section-intro { font-size: 14px; color: #444; margin-bottom: 24px; line-height: 1.7; }
 
-  h2.section-title {
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--navy);
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  h2.section-title .platform-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px; height: 34px;
-    border-radius: 8px;
-    background: var(--red);
-    color: #fff;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-  .section-subtitle {
-    font-size: 13.5px;
-    color: #666;
-    margin-bottom: 28px;
-  }
-
-  h3.method-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--navy);
-    margin: 32px 0 14px;
-    padding-bottom: 7px;
-    border-bottom: 2px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .method-badge {
-    font-size: 10.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    background: var(--red-light);
-    color: var(--red);
-    border: 1px solid rgba(195,51,41,.2);
-  }
-  .method-badge.blue { background: #eef6ff; color: #2563eb; border-color: rgba(37,99,235,.2); }
-
-  /* ── Callout boxes ────────────────────────────────────────────── */
-  .callout {
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin: 16px 0;
-    font-size: 13.5px;
-    line-height: 1.6;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
+  /* ── Callouts ── */
+  .callout { border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 13.5px; line-height: 1.6; display: flex; gap: 12px; align-items: flex-start; }
   .callout-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
   .callout-body strong { display: block; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
   .callout.warn  { background: var(--warn-bg);  border-left: 4px solid var(--warn-border); }
   .callout.note  { background: var(--note-bg);  border-left: 4px solid var(--note-border); }
   .callout.tip   { background: var(--tip-bg);   border-left: 4px solid var(--tip-border);  }
-  .callout.danger{ background: #fff2f2; border-left: 4px solid var(--red); }
 
-  /* ── Prerequisites ────────────────────────────────────────────── */
-  .prereq-block {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 22px;
-    margin-bottom: 22px;
-  }
-  .prereq-block h4 {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--red);
-    margin-bottom: 10px;
-  }
-  .prereq-block ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .prereq-block ul li {
-    font-size: 13.5px;
-    color: #333;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .prereq-block ul li::before {
-    content: "✓";
-    color: var(--tip-border);
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  /* ── Steps ────────────────────────────────────────────────────── */
+  /* ── Steps ── */
   .steps { display: flex; flex-direction: column; gap: 0; margin: 18px 0; }
-  .step {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    position: relative;
-  }
-  .step:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 15px; top: 36px; bottom: -4px;
-    width: 2px;
-    background: var(--border);
-  }
-  .step-num {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--red);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 900;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    z-index: 1;
-  }
-  .step-body {
-    flex: 1;
-    padding-bottom: 20px;
-  }
-  .step-body strong {
-    display: block;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 4px;
-  }
-  .step-body p, .step-body li { font-size: 13.5px; color: #444; }
-  .step-body ul { margin: 6px 0 0 16px; }
-  .step-body ul li { margin-bottom: 3px; }
+  .step { display: flex; gap: 16px; align-items: flex-start; position: relative; }
+  .step:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 36px; bottom: -4px; width: 2px; background: var(--border); }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--red); color: #fff; font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
+  .step-body { flex: 1; padding-bottom: 20px; font-size: 13.5px; color: #444; }
+  .step-body strong { font-weight: 700; color: #1a1a1a; }
 
-  /* ── Confirmation box ─────────────────────────────────────────── */
-  .confirmation {
-    background: var(--tip-bg);
-    border: 1px solid var(--tip-border);
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin-top: 22px;
-    font-size: 13.5px;
-    color: #166534;
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .confirmation strong { font-weight: 700; }
+  /* ── Screenshot images ── */
+  .step-img { display: block; margin: 12px 0 4px 0; max-width: 100%; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
 
-  /* ── Code / path ──────────────────────────────────────────────── */
-  code {
-    font-family: 'Chivo Mono', 'Courier New', monospace;
-    font-size: 12.5px;
-    background: #f0f2f5;
-    border: 1px solid #d8dce3;
-    border-radius: 4px;
-    padding: 1px 6px;
-    color: #c33329;
-  }
-
-  /* ── Responsive ───────────────────────────────────────────────── */
+  /* ── Responsive ── */
   @media (max-width: 760px) {
     #sidebar { transform: translateX(-100%); }
-    #main    { margin-left: 0; }
+    #main { margin-left: 0; }
     .page-hero, .content-section { padding-left: 20px; padding-right: 20px; }
     .section-divider { margin-left: 20px; margin-right: 20px; }
   }
@@ -349,414 +104,303 @@
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════════════════════════
-     SIDEBAR
-═══════════════════════════════════════════════════════════════════ -->
 <aside id="sidebar">
   <div class="sidebar-logo">
     <div class="brand">Secure<span>W2</span></div>
     <div class="tagline">Meraki MAC Authentication</div>
   </div>
-
   <nav id="nav">
-    <div class="nav-section-label">Overview</div>
-    <a href="#overview" class="active">Introduction
-      <span class="nav-sub">How MAC Authentication works</span>
-    </a>
-
-    <div class="nav-section-label">SecureW2 Configuration</div>
-    <a href="#identity-provider">Identity Provider
-      <span class="nav-sub">JoinNow Management Portal</span>
+    <div class="nav-section-label">SecureW2 Setup</div>
+    <a href="#identity-provider" class="active">Create Identity Provider
+      <span class="nav-sub">Identity Management</span>
     </a>
     <a href="#role-network-policy">Role &amp; Network Policy
       <span class="nav-sub">Policy Management</span>
     </a>
-
-    <div class="nav-section-label">Meraki Configuration</div>
+    <div class="nav-section-label">Meraki Setup</div>
     <a href="#meraki">Configure Cisco Meraki
-      <span class="nav-sub">Wireless &amp; RADIUS setup</span>
+      <span class="nav-sub">Wireless &amp; RADIUS</span>
     </a>
   </nav>
 </aside>
 
-<!-- ════════════════════════════════════════════════════════════════
-     MAIN
-═══════════════════════════════════════════════════════════════════ -->
 <main id="main">
 
-  <!-- Hero -->
   <header class="page-hero">
     <div class="eyebrow">SecureW2 · Cisco Meraki</div>
     <h1>Cisco Meraki MAC Authentication</h1>
-    <p>Configure MAC-based network access control using SecureW2's JoinNow Management Portal and Cisco Meraki. This guide walks through creating an Identity Provider, setting up Role and Network Policies, and configuring your Meraki SSID to authenticate devices by MAC address.</p>
+    <p>Configure MAC-based network access control using SecureW2's JoinNow Management Portal and Cisco Meraki. Follow the steps below to create an Identity Provider, set up Role and Network Policies, and configure your Meraki SSID.</p>
     <div class="badge-row">
       <span class="badge">SecureW2 JoinNow</span>
       <span class="badge">Cisco Meraki</span>
       <span class="badge">MAC Authentication</span>
-      <span class="badge">802.1X</span>
     </div>
   </header>
 
-  <!-- ── OVERVIEW ─────────────────────────────────────────────── -->
-  <section id="overview" class="content-section">
-    <h2 class="section-title">
-      <span class="platform-icon">!</span>
-      Overview
-    </h2>
-    <p class="section-subtitle">What MAC Authentication does and when to use it</p>
-
-    <p>MAC Authentication allows network access to be granted or denied based on a device's MAC address, without requiring user credentials or client certificates. SecureW2 acts as the RADIUS server, validating the device MAC against an Identity Provider you configure, and Cisco Meraki enforces the policy on the SSID.</p>
-
-    <div class="callout note">
-      <span class="callout-icon">ℹ️</span>
-      <div class="callout-body">
-        <strong>Prerequisites</strong>
-        An active SecureW2 JoinNow ASO subscription, access to the JoinNow MultiOS Management Portal, and admin access to the Cisco Meraki Dashboard are required before proceeding.
-      </div>
-    </div>
-
-    <div class="callout warn">
-      <span class="callout-icon">⚠️</span>
-      <div class="callout-body">
-        <strong>MAC addresses must be registered first</strong>
-        Devices must be added to the Identity Provider's Conditions tab before they can authenticate. If a device's MAC address is not listed, authentication will be denied.
-      </div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- ── IDENTITY PROVIDER ──────────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 1 — Create Identity Provider
+  ══════════════════════════════════════════════════════════════════ -->
   <section id="identity-provider" class="content-section">
     <h2 class="section-title">
-      <span class="platform-icon" style="font-size:18px;">🔑</span>
+      <span class="icon">1</span>
       Create Identity Provider in SecureW2
     </h2>
     <p class="section-subtitle">JoinNow MultiOS Management Portal — Identity Management</p>
 
-    <div class="prereq-block">
-      <h4>Prerequisites</h4>
-      <ul>
-        <li>Admin access to the JoinNow MultiOS Management Portal</li>
-        <li>MAC addresses of all devices to be authenticated</li>
-        <li>Active SecureW2 JoinNow ASO subscription</li>
-      </ul>
-    </div>
+    <p class="section-intro">Follow the below steps to create an Identity Provider in SecureW2 and configure it for MAC Authentication:</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <div class="step-body">
-          <strong>Log in to the JoinNow MultiOS Management Portal</strong>
-          <p>Sign in with your administrator credentials.</p>
-        </div>
+        <div class="step-body">Log in to <strong>JoinNow MultiOS Management Portal</strong>.</div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <div class="step-body">
-          <strong>Navigate to Identity Providers</strong>
-          <p>Go to <em>Identity Management &gt; Identity Providers</em> and click <strong>Add Identity Provider</strong>.</p>
-        </div>
+        <div class="step-body">Navigate to <strong>Identity Management &gt; Identity Providers &gt; Add Identity Provider</strong>.</div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <div class="step-body">
-          <strong>Enter a name and description</strong>
-          <p>In the <strong>NAME</strong> field, enter a name for your Identity Provider. In the <strong>Description</strong> field, enter a suitable description.</p>
-        </div>
+        <div class="step-body">Enter a name for your Identity provider in the <strong>NAME</strong> field.</div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
-        <div class="step-body">
-          <strong>Set the type to MAC Authentication</strong>
-          <p>Under the <strong>Type</strong> drop-down, select <strong>MAC Authentication</strong>.</p>
-        </div>
+        <div class="step-body">In the <strong>Description</strong> field, enter a suitable description.</div>
       </div>
       <div class="step">
         <div class="step-num">5</div>
+        <div class="step-body">Under the Type drop-down, select <strong>MAC Authentication</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">Click <strong>Save</strong>. The page refreshes.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">Click on the <strong>Conditions</strong> Tab.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-body">Click <strong>Add Device</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">9</div>
+        <div class="step-body">Enter the MAC Address of the device you need authenticated in the <strong>MAC Address</strong> field.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">10</div>
         <div class="step-body">
-          <strong>Save the Identity Provider</strong>
-          <p>Click <strong>Save</strong>. The page will refresh.</p>
+          Click <strong>Save</strong>.
+          <img class="step-img" src="images/image3.png" alt="Add Device dialog showing MAC Address field and Save button" />
         </div>
+      </div>
+      <div class="step">
+        <div class="step-num">11</div>
+        <div class="step-body">Click <strong>Update</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider" />
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 2 — Role Policy & Network Policy
+  ══════════════════════════════════════════════════════════════════ -->
+  <section id="role-network-policy" class="content-section">
+    <h2 class="section-title">
+      <span class="icon">2</span>
+      To set up Role Policy and Network Policy
+    </h2>
+    <p class="section-subtitle">JoinNow MultiOS Management Portal — Policy Management</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">Log in to the <strong>JoinNow MultiOS Management Portal</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">Navigate to <strong>Policy Management &gt; Role Policies</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">Click <strong>Add Role</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">In the <strong>Name</strong> field, enter a name for your role policy.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">In the <strong>Display Description</strong> field, enter a suitable description.</div>
       </div>
       <div class="step">
         <div class="step-num">6</div>
         <div class="step-body">
-          <strong>Open the Conditions tab</strong>
-          <p>Click on the <strong>Conditions</strong> tab that now appears.</p>
+          Click <strong>Save</strong>.
+          <img class="step-img" src="images/image5.png" alt="Role Policy Basic tab showing Name field with MAC role and Save button" />
         </div>
       </div>
       <div class="step">
         <div class="step-num">7</div>
-        <div class="step-body">
-          <strong>Add a device MAC address</strong>
-          <p>Click <strong>Add Device</strong>. In the <strong>MAC Address</strong> field, enter the MAC address of the device you need to authenticate. Click <strong>Save</strong>.</p>
-        </div>
+        <div class="step-body">The page refreshes and the <strong>Conditions</strong> tab appears. Click on the <strong>Conditions</strong> tab.</div>
       </div>
       <div class="step">
         <div class="step-num">8</div>
         <div class="step-body">
-          <strong>Finalise the Identity Provider</strong>
-          <p>Click <strong>Update</strong> to save all changes to the Identity Provider.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="callout tip">
-      <span class="callout-icon">✅</span>
-      <div class="callout-body">
-        <strong>Repeat for each device</strong>
-        Repeat steps 7–8 for every device MAC address that requires network access. All MAC addresses must be present before Meraki is configured.
-      </div>
-    </div>
-
-    <div class="confirmation">
-      <span style="font-size:18px;">✅</span>
-      <div><strong>Confirmation:</strong> The Identity Provider appears in the list under <em>Identity Management &gt; Identity Providers</em> with type <em>MAC Authentication</em> and all required MAC addresses listed under its Conditions tab.</div>
-    </div>
-  </section>
-
-  <hr class="section-divider" />
-
-  <!-- ── ROLE & NETWORK POLICY ──────────────────────────────────── -->
-  <section id="role-network-policy" class="content-section">
-    <h2 class="section-title">
-      <span class="platform-icon" style="font-size:18px;">📋</span>
-      Set up Role Policy and Network Policy
-    </h2>
-    <p class="section-subtitle">JoinNow MultiOS Management Portal — Policy Management</p>
-
-    <!-- Role Policy -->
-    <h3 class="method-title">Role Policy <span class="method-badge">Step 1 of 2</span></h3>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <strong>Log in to the JoinNow MultiOS Management Portal</strong>
-          <p>Sign in with your administrator credentials.</p>
+          From the <strong>Identity Provider</strong> drop-down, select the Identity Provider you created with <strong>MAC Authentication</strong> type.
+          <div class="callout note" style="margin-top:10px;">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-body"><strong>Note</strong>Devices for MAC Authentication must be added in this Identity Provider.</div>
+          </div>
         </div>
       </div>
       <div class="step">
-        <div class="step-num">2</div>
+        <div class="step-num">9</div>
         <div class="step-body">
-          <strong>Navigate to Role Policies</strong>
-          <p>Go to <em>Policy Management &gt; Role Policies</em> and click <strong>Add Role</strong>.</p>
+          Click <strong>Update</strong>.
+          <img class="step-img" src="images/image8.png" alt="Role Policy Conditions tab showing Identity Provider set to MacAuth and Update button" />
         </div>
       </div>
       <div class="step">
-        <div class="step-num">3</div>
+        <div class="step-num">10</div>
+        <div class="step-body">Under <strong>Policy Management</strong>, click on <strong>Network Policies</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">11</div>
+        <div class="step-body">In the <strong>Name</strong> field, enter a name for your network policy.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">12</div>
+        <div class="step-body">In the <strong>Display Description</strong> field, enter a suitable description.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">13</div>
         <div class="step-body">
-          <strong>Enter a name and description</strong>
-          <p>In the <strong>Name</strong> field, enter a name for your role policy. In the <strong>Display Description</strong> field, enter a suitable description. Click <strong>Save</strong>.</p>
+          Click <strong>Save</strong>.
+          <img class="step-img" src="images/image1.png" alt="Network Policy Basic tab showing Name field with Mac Network and Save button" />
         </div>
       </div>
       <div class="step">
-        <div class="step-num">4</div>
+        <div class="step-num">14</div>
+        <div class="step-body">Click the <strong>Conditions</strong> tab.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">15</div>
+        <div class="step-body">Select <strong>Match All</strong> or <strong>Match Any</strong> based on your requirement to set an authentication criteria. In the case explained here, we are selecting <strong>Match All</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">16</div>
+        <div class="step-body">Click <strong>Add rule</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">17</div>
+        <div class="step-body">Click on <strong>Identity</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">18</div>
+        <div class="step-body">Click <strong>Select</strong> adjacent to <strong>Role</strong> option.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">19</div>
         <div class="step-body">
-          <strong>Open the Conditions tab</strong>
-          <p>The page refreshes and the <strong>Conditions</strong> tab appears. Click on it.</p>
+          Click <strong>Save</strong>.
+          <img class="step-img" src="images/image7.png" alt="Rules panel showing Identity expanded with Role and Username options and Save button" />
         </div>
       </div>
       <div class="step">
-        <div class="step-num">5</div>
-        <div class="step-body">
-          <strong>Select the MAC Authentication Identity Provider</strong>
-          <p>From the <strong>Identity Provider</strong> drop-down, select the Identity Provider you created with the MAC Authentication type.</p>
-        </div>
+        <div class="step-num">20</div>
+        <div class="step-body">The option <strong>Role</strong> appears under the <strong>Conditions</strong> tab.</div>
       </div>
       <div class="step">
-        <div class="step-num">6</div>
-        <div class="step-body">
-          <strong>Save the Role Policy</strong>
-          <p>Click <strong>Update</strong> to save your changes.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="callout note">
-      <span class="callout-icon">ℹ️</span>
-      <div class="callout-body">
-        <strong>Note</strong>
-        Devices for MAC Authentication must be added in the Identity Provider before this Role Policy will match them successfully.
-      </div>
-    </div>
-
-    <!-- Network Policy -->
-    <h3 class="method-title">Network Policy <span class="method-badge">Step 2 of 2</span></h3>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <strong>Navigate to Network Policies</strong>
-          <p>Under <em>Policy Management</em>, click <strong>Network Policies</strong>.</p>
-        </div>
+        <div class="step-num">21</div>
+        <div class="step-body">From the <strong>Role Equals</strong> drop-down, select the role policy you created in the previous step.</div>
       </div>
       <div class="step">
-        <div class="step-num">2</div>
+        <div class="step-num">22</div>
         <div class="step-body">
-          <strong>Enter a name and description</strong>
-          <p>In the <strong>Name</strong> field, enter a name for your network policy. In the <strong>Display Description</strong> field, enter a suitable description. Click <strong>Save</strong>.</p>
+          Click <strong>Update</strong>.
+          <img class="step-img" src="images/image4.png" alt="Network Policy Conditions tab showing Match All selected with Role Equals MAC role and Update button" />
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <strong>Open the Conditions tab</strong>
-          <p>Click the <strong>Conditions</strong> tab.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <strong>Set the match criteria</strong>
-          <p>Select <strong>Match All</strong> or <strong>Match Any</strong> based on your requirement. Click <strong>Add rule</strong>.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">5</div>
-        <div class="step-body">
-          <strong>Add an Identity rule</strong>
-          <p>Click <strong>Identity</strong>, then click <strong>Select</strong> adjacent to the <strong>Role</strong> option. Click <strong>Save</strong>. The <strong>Role</strong> option now appears under the Conditions tab.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">6</div>
-        <div class="step-body">
-          <strong>Select the Role Policy</strong>
-          <p>From the <strong>Role Equals</strong> drop-down, select the role policy you created in the previous section.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">7</div>
-        <div class="step-body">
-          <strong>Save the Network Policy</strong>
-          <p>Click <strong>Update</strong> to save all changes.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="confirmation">
-      <span style="font-size:18px;">✅</span>
-      <div><strong>Confirmation:</strong> Both the Role Policy and Network Policy appear in their respective lists under <em>Policy Management</em>, with the correct Identity Provider and Role references configured.</div>
     </div>
   </section>
 
   <hr class="section-divider" />
 
-  <!-- ── CONFIGURE CISCO MERAKI ──────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════════════
+       SECTION 3 — Configure Cisco Meraki
+  ══════════════════════════════════════════════════════════════════ -->
   <section id="meraki" class="content-section">
     <h2 class="section-title">
-      <span class="platform-icon" style="font-size:18px;">🔗</span>
+      <span class="icon">3</span>
       Configure Cisco Meraki
     </h2>
     <p class="section-subtitle">Meraki Dashboard — Wireless Access Control &amp; RADIUS</p>
 
-    <div class="prereq-block">
-      <h4>Prerequisites</h4>
-      <ul>
-        <li>Admin access to the Cisco Meraki Dashboard</li>
-        <li>RADIUS Host IP, Port, and Secret from the SecureW2 Management Portal</li>
-        <li>An existing SSID to configure for MAC-based access control</li>
-      </ul>
-    </div>
-
-    <div class="callout note">
-      <span class="callout-icon">ℹ️</span>
-      <div class="callout-body">
-        <strong>Where to find RADIUS credentials</strong>
-        In the SecureW2 Management Portal, navigate to <em>RADIUS &gt; RADIUS Configuration</em> to retrieve the Host IP, Port, and Secret values needed below.
-      </div>
-    </div>
+    <p class="section-intro">Follow the below steps to set up MAC based Authentication using Meraki:</p>
 
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <div class="step-body">
-          <strong>Log in to the Cisco Meraki Portal</strong>
-          <p>Sign in at <a href="https://dashboard.meraki.com" style="color:var(--red);">dashboard.meraki.com</a> with your administrator credentials.</p>
-        </div>
+        <div class="step-body">Log into the <strong>Cisco Meraki</strong> Portal.</div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <div class="step-body">
-          <strong>Navigate to Access Control</strong>
-          <p>Go to <em>Wireless &gt; Access Control</em>.</p>
-        </div>
+        <div class="step-body">Navigate to <strong>Wireless &gt; Access Control</strong>.</div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <div class="step-body">
-          <strong>Select your SSID</strong>
-          <p>From the <strong>SSID</strong> drop-down, select the SSID you want to configure for MAC-based authentication.</p>
-        </div>
+        <div class="step-body">Select your SSID from the <strong>SSID</strong> drop-down.</div>
       </div>
       <div class="step">
         <div class="step-num">4</div>
         <div class="step-body">
-          <strong>Enable MAC-based access control</strong>
-          <p>Under <strong>Network Access</strong>, select <strong>MAC-based access control (No encryption)</strong>.</p>
+          Under <strong>Network Access</strong> control, select <strong>MAC-based access control</strong>.
+          <img class="step-img" src="images/image2.png" alt="Meraki Access Control page showing MAC-based access control selected" />
         </div>
       </div>
       <div class="step">
         <div class="step-num">5</div>
-        <div class="step-body">
-          <strong>Set Splash page to None</strong>
-          <p>Under the <strong>Splash page</strong> setting, select <strong>None</strong>.</p>
-        </div>
+        <div class="step-body">Under the <strong>Splash page</strong>, select <strong>None</strong>.</div>
       </div>
       <div class="step">
         <div class="step-num">6</div>
-        <div class="step-body">
-          <strong>Add the SecureW2 RADIUS server</strong>
-          <p>In the <strong>RADIUS servers</strong> section, click <strong>Add a server</strong>. Copy and paste the <strong>Host IP</strong>, <strong>Port</strong>, and <strong>Secret</strong> from <em>SecureW2 Management Portal &gt; RADIUS &gt; RADIUS Configuration</em> into the corresponding fields in Meraki.</p>
-        </div>
+        <div class="step-body">For the <strong>Radius servers</strong> section, click <strong>Add a server</strong>.</div>
       </div>
       <div class="step">
         <div class="step-num">7</div>
         <div class="step-body">
-          <strong>Save the configuration</strong>
-          <p>Scroll to the bottom of the page and click <strong>Save changes</strong>.</p>
+          Copy and paste the <strong>Host IP</strong>, <strong>Port</strong>, and <strong>Secret</strong> from <strong>Radius Configuration</strong> (<strong>SecureW2 Management Portal &gt; Radius &gt; Radius Configuration</strong>) in the <strong>Host</strong>, <strong>Port</strong> and <strong>Secret</strong> fields in Meraki as shown below:
+          <img class="step-img" src="images/image6.png" alt="Meraki RADIUS servers table showing Host, Port, Secret fields populated" />
         </div>
       </div>
-    </div>
-
-    <div class="confirmation">
-      <span style="font-size:18px;">✅</span>
-      <div><strong>Confirmation:</strong> Registered devices connect to the SSID automatically. The Meraki event log (<em>Network-wide &gt; Event log</em>) shows successful RADIUS MAC authentication events with no failures.</div>
+      <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-body">Scroll down to the bottom of the page and click <strong>Save changes</strong>.</div>
+      </div>
     </div>
   </section>
 
   <div style="height:64px;"></div>
-
 </main>
 
-<!-- ════════════════════════════════════════════════════════════════
-     Scrollspy
-═══════════════════════════════════════════════════════════════════ -->
 <script>
 (function () {
   const navLinks = document.querySelectorAll('#nav a');
   const sections = Array.from(navLinks)
     .map(a => document.querySelector(a.getAttribute('href')))
     .filter(Boolean);
-
   function onScroll() {
     const scrollY = window.scrollY + 120;
     let current = sections[0];
-    for (const s of sections) {
-      if (s.offsetTop <= scrollY) current = s;
-    }
+    for (const s of sections) { if (s.offsetTop <= scrollY) current = s; }
     navLinks.forEach(a => {
       a.classList.toggle('active', a.getAttribute('href') === '#' + current.id);
     });
   }
-
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 })();
 </script>
-
 </body>
 </html>
